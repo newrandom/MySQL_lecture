@@ -1,0 +1,140 @@
+-- INNER JOIN 예제 1
+-- 1. SNL_SHOW 호스트로 출연한 CELEB을 기준으로
+-- 2. CELEB 테이블과 SNL_SHOW 테이블을 INNER JOIN 해주세요.
+
+SELECT CELEB.ID, CELEB.NAME, SNL_SHOW.ID, SNL_SHOW.HOST
+FROM CELEB
+INNER JOIN SNL_SHOW
+ON CELEB.NAME = SNL_SHOW.HOST;
+
+-- LEFT JOIN 예제 1
+-- SNL_SHOW에 호스트로 출연한 CELEB 을 기준(FROM)으로 
+-- CELEB 테이블과 SNL_SHOW 테이블을 LEFT JOIN 해주세요
+
+SELECT CELEB.ID, CELEB.NAME, SNL_SHOW.ID, SNL_SHOW.HOST FROM CELEB		-- CELEB 테이블을 기준(왼쪽)으로 
+LEFT JOIN SNL_SHOW				-- SNL_SHOW 테이블을 오른쪽에 붙임.
+ON CELEB.NAME = SNL_SHOW.HOST;	-- CELEB.NAME 과 SNL_SHOW.HOST 의 이름이 같은것을 가져옴.
+
+-- compare with
+SELECT CELEB.ID, CELEB.NAME, SNL_SHOW.ID, SNL_SHOW.HOST FROM SNL_SHOW		-- select column은 동일하게, from table 은 반대로
+RIGHT JOIN CELEB															-- right join 하고, table 은 반대로
+ON CELEB.NAME = SNL_SHOW.HOST;												-- 조회 기준은 동일하게
+
+-- RIGHT JOIN 예제 1
+-- SNL_SHOW 에 호스트로 출연한 CELEB 을 기준으로
+-- CELEB 테이블과 SNL_SHOW 테이블을 RIGHT JOIN 해주세요.
+
+SELECT CELEB.ID, CELEB.NAME, SNL_SHOW.ID, SNL_SHOW.HOST FROM CELEB		# celeb table 을 기준으로	
+RIGHT JOIN SNL_SHOW		# snl_show 테이블을 오른쪽에
+ON CELEB.NAME = SNL_SHOW.HOST;		# celeb.name = snl_show.host 를 만족하는 것
+
+-- compare with
+SELECT CELEB.ID, CELEB.NAME, SNL_SHOW.ID, SNL_SHOW.HOST FROM SNL_SHOW	# select columns 는 동일하게, from table 반대로
+LEFT JOIN CELEB		# left join 진행
+ON CELEB.NAME = SNL_SHOW.HOST;	# 기준도 동일하게 
+
+# FULL OUTER JOIN 예제 1		-- mySQL 에는 FULL OUTER JOIN 이라는 명령어가 없음. // LEFT JOIN UNION RIGHT JOIN 을 이용해야 한다.
+-- snl_show에 호스트로 출연한 celeb을 기준으로
+-- celeb 테이블과 snl_show 테이블을 full outer join 해주세요.
+
+-- SELECT CELEB.ID, CELEB.NAME, SNL_SHOW.ID, SNL_SHOW.HOST FROM CELEB
+-- FULL OUTER JOIN SNL_SHOW
+-- ON CELEB.NAME = SNL_SHOW.HOST;
+
+SELECT CELEB.ID, CELEB.NAME, SNL_SHOW.ID, SNL_SHOW.HOST FROM CELEB
+LEFT JOIN SNL_SHOW 
+ON CELEB.NAME = SNL_SHOW.HOST
+
+UNION
+
+SELECT CELEB.ID, CELEB.NAME, SNL_SHOW.ID, SNL_SHOW.HOST FROM CELEB
+RIGHT JOIN SNL_SHOW
+ON CELEB.NAME = SNL_SHOW.HOST;
+
+# SELF JOIN 예제 1
+-- SNL_SHOW에 호스트로 출연한 CELEB을 기준으로
+-- CELEB 테이블과 SNL_SHOW 테이블을 SELF JOIN 하세요.
+
+SELECT CELEB.ID, CELEB.NAME, SNL_SHOW.ID, SNL_SHOW.HOST 
+FROM CELEB, SNL_SHOW
+WHERE CELEB.NAME = SNL_SHOW.HOST;
+
+# SELF JOIN 예제 2
+-- CELEB 테이블의 연예인 중,
+-- SNL_SHOW 에 HOST로 출연했고,
+-- 소속사가 안테나인 사람의 이름과 직업을 검색해주세요.
+
+SELECT CELEB.NAME, CELEB.JOB_TITLE, CELEB.AGENCY
+FROM CELEB, SNL_SHOW
+WHERE CELEB.NAME = SNL_SHOW.HOST AND CELEB.AGENCY='안테나';
+
+# SELF JOIN 예제 3
+-- CELEB 테이블의 연예인 중, SNL_SHOW 에 HOST로 출연했고,
+-- 영화배우는 아니면서 YG엔터테이먼트 소속이거나,
+-- 40세 이상이면서 YG엔터테이먼트 소속이 아닌 연예인의
+-- 이름과 나이, 직업, 소속사, 시즌, 에피소드 정보를 검색해주세요.
+
+SELECT * FROM CELEB LIMIT 1;
+SELECT * FROM SNL_SHOW LIMIT 1;
+
+SELECT CELEB.NAME, CELEB.AGE, CELEB.JOB_TITLE, CELEB.AGENCY, SNL_SHOW.SEASON, SNL_SHOW.EPISODE	-- 4
+FROM CELEB, SNL_SHOW	
+WHERE CELEB.NAME = SNL_SHOW.HOST 	-- 1
+AND ((CELEB.JOB_TITLE NOT LIKE '%영화배우%' AND CELEB.AGENCY = 'YG엔터테이먼트')		-- 2
+OR (CELEB.AGE >= 40 AND CELEB.AGENCY != 'YG엔터테이먼트'));		-- 3
+
+# SELF JOIN 예제 4
+-- snl_show에 출연한 연예인의 
+-- snl_show 아이디, 시즌, 에피소드, 이름, 직업 정보를 검색
+
+SELECT SNL_SHOW.ID, SNL_SHOW.SEASON, SNL_SHOW.EPISODE, CELEB.NAME, CELEB.JOB_TITLE		-- 2
+FROM SNL_SHOW, CELEB
+WHERE CELEB.NAME = SNL_SHOW.HOST;		-- 1
+
+# SELF JOIN 예제 5
+-- snl_show 시즌 8에 출연한 celeb 중,
+-- 에피소드 7, 9, 10 중에 출연했거나,
+-- 소속사가 YG로 시작하고, 뒤에 6글자로 끝나는 사람 중
+-- 작년(2020년) 9월 15일 이후에 출연했던 사람을 검색해 주세요.
+
+SELECT CELEB.NAME, SNL_SHOW.SEASON, SNL_SHOW.EPISODE, CELEB.AGENCY, SNL_SHOW.BROADCAST_DATE
+FROM CELEB, SNL_SHOW
+WHERE CELEB.NAME = SNL_SHOW.HOST AND SNL_SHOW.SEASON = 8		-- 1
+AND (SNL_SHOW.EPISODE IN (7, 9, 10) 		-- 2
+OR CELEB.AGENCY LIKE ('%YG______'))		-- 3
+AND SNL_SHOW.BROADCAST_DATE > '2020-09-15';
+
+# quiz 1
+-- snl_show 에 출연한 celeb 테이블의 연예인 중, 
+-- 영화배우나 텔런트가 아닌 연예인의
+-- 아이디, 이름, 직업, 시즌, 에피소드 정보를 검색하세요.
+
+SELECT CELEB.ID, CELEB.NAME, CELEB.JOB_TITLE, SNL_SHOW.SEASON, SNL_SHOW.EPISODE
+FROM CELEB, SNL_SHOW
+WHERE CELEB.NAME = SNL_SHOW.HOST		-- 1
+AND (CELEB.JOB_TITLE NOT LIKE '%영화배우%' OR CELEB.JOB_TITLE NOT LIKE '%텔런트%');		-- 2 // 영화배우가 아니거나, 텔런트가 아닌 (문제 취지와 맞지 않는 문법 ㅜㅜ)
+
+SELECT CELEB.ID, CELEB.NAME, CELEB.JOB_TITLE, SNL_SHOW.SEASON, SNL_SHOW.EPISODE
+FROM CELEB, SNL_SHOW
+WHERE CELEB.NAME = SNL_SHOW.HOST
+AND NOT(CELEB.JOB_TITLE LIKE '%영화배우%' OR CELEB.JOB_TITLE LIKE '%텔런트%');		-- 영화배우나 텔런트가 아닌
+
+# quiz 2
+-- snl_show 에 출연한 celeb 중
+-- 작년(2020년) 9월 15일 이후에 출연했거나
+-- 소속사 이름이 '엔터테이먼트'로 끝나지 않으면서
+-- 영화배우나 개그맨이 아닌 연예인의
+-- CELEB 아이디, 이름, 직업, 소속사를 검색하세요.
+
+SELECT * -- CELEB.ID, CELEB.NAME, CELEB.JOB_TITLE, CELEB.AGENCY
+FROM CELEB, SNL_SHOW
+WHERE CELEB.NAME = SNL_SHOW.HOST		-- 1
+AND (SNL_SHOW.BROADCAST_DATE > '2020-09-15' -- 2
+OR (NOT CELEB.AGENCY LIKE '%엔터테이먼트'		-- 3	// 2번과 3번 조건은 동시 (or)에 이루어 져야 함.
+AND NOT (CELEB.JOB_TITLE LIKE '%영화배우%' OR CELEB.JOB_TITLE LIKE '%개그맨%')));	-- 4
+
+SELECT CELEB.ID, CELEB.NAME, CELEB.JOB_TITLE, CELEB.AGENCY
+FROM CELEB, SNL_SHOW
+WHERE CELEB.NAME = SNL_SHOW.HOST
+AND (SNL_SHOW.BROADCAST_DATE > '2020-09-15' OR NOT CELEB.AGENCY LIKE '%엔터테이먼트%')
+AND NOT (CELEB.JOB_TITLE LIKE '%영화배우%' OR CELEB.JOB_TITLE LIKE '%개그맨%');
