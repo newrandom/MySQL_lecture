@@ -1,0 +1,5 @@
+CREATE TABLE sql_file
+(
+    ID INT,
+    FILENAME VARCHAR(16)
+);
